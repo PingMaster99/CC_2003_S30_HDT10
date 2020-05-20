@@ -5,8 +5,9 @@ import java.util.Set;
 
 public class WeightedGraph implements Graph{
 
-    LinkedHashMap<String, Integer> citiesMap = new LinkedHashMap<>();
-    private Integer graphMatrix[][];
+    private LinkedHashMap<String, Integer> citiesMap = new LinkedHashMap<>();
+    private LinkedHashMap<Integer, String> integerMap = new LinkedHashMap<>();
+    private Integer[][] graphMatrix;
     private int numberOfCities = -1;
 
     WeightedGraph(String fileName) {
@@ -28,6 +29,7 @@ public class WeightedGraph implements Graph{
                 }
             }
             graphMatrix = new Integer[numberOfCities + 1][numberOfCities + 1];
+            matrixInitialization();
 
             BufferedReader reader2 = new BufferedReader(new FileReader(fileName));
             while((line = reader2.readLine()) != null) {
@@ -46,11 +48,18 @@ public class WeightedGraph implements Graph{
     }
 
     public void addEdge(String origin, String destiny, int weight) {
-        if(citiesMap.containsKey(origin) && citiesMap.containsKey(destiny)) {
+        if(citiesMap.containsKey(origin.toLowerCase()) && citiesMap.containsKey(destiny.toLowerCase())) {
             graphMatrix[citiesMap.get(origin.toLowerCase())][citiesMap.get(destiny.toLowerCase())] = weight;
         }
     }
 
+    private void matrixInitialization(){
+        for(int i = 0; i < graphMatrix.length; i++) {
+            for(int j = 0; j < graphMatrix.length; j++) {
+                graphMatrix[i][j] = 9999999;
+            }
+        }
+    }
     public void print() {
 
         Set<String> cities = citiesMap.keySet();
@@ -64,7 +73,7 @@ public class WeightedGraph implements Graph{
 
         for(int i = 0; i < citiesMap.size(); i++) {
             for(int j = 0; j < citiesMap.size(); j++) {
-                if(graphMatrix[i][j] == null) {
+                if(graphMatrix[i][j] == 9999999) {
                     System.out.print("INF ");
                 } else {
                     System.out.print(graphMatrix[i][j] + " ");
@@ -73,6 +82,15 @@ public class WeightedGraph implements Graph{
             System.out.println();
         }
     }
+
+    public void printCities() {
+        Set<String> cities = citiesMap.keySet();
+        System.out.print("Las ciudades disponibles son: ");
+        for(String city : cities) {
+            System.out.print(city + " ");
+        }
+    }
+
     public void removeEdge(String origin, String destiny) {
         if(graphMatrix[citiesMap.get(origin.toLowerCase())][citiesMap.get(destiny.toLowerCase())] != null) {
             graphMatrix[citiesMap.get(origin.toLowerCase())][citiesMap.get(destiny.toLowerCase())] = null;
@@ -83,6 +101,11 @@ public class WeightedGraph implements Graph{
     public void addNode(String cityName) {
         numberOfCities++;
         citiesMap.put(cityName.toLowerCase(), numberOfCities);
+        integerMap.put(numberOfCities, cityName.toLowerCase());
+    }
+
+    public int getNode(String cityName) {
+        return citiesMap.get(cityName.toLowerCase());
     }
 
     public boolean containsNode(String name) {
@@ -92,4 +115,15 @@ public class WeightedGraph implements Graph{
         return false;
     }
 
+    public LinkedHashMap<String, Integer> getCitiesMap() {
+        return citiesMap;
+    }
+
+    public Integer[][] getGraphMatrix() {
+        return this.graphMatrix;
+    }
+
+    public LinkedHashMap<Integer, String> getIntegerMap() {
+        return integerMap;
+    }
 }
